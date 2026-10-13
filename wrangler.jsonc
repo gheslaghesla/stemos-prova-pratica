@@ -2,10 +2,11 @@
   "name": "stemos-prova-pratica",
   "main": "worker.js",
   "compatibility_date": "2026-10-13",
-  "r2_buckets": [
+  "d1_databases": [
     {
-      "binding": "BUCKET",
-      "bucket_name": "stemos-provas"
+      "binding": "DB",
+      "database_name": "stemos-provas",
+      "database_id": "1ebb24f1-44dc-45f5-b1cb-c3b0f17216e7"
     }
   ]
 }

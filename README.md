@@ -1,38 +1,27 @@
 # Prova prática stemOS
 
-Três atividades para assistente administrativo/comercial: e-mail sobre o pedido 345349 enviado com prazo de 5 dias úteis, atendimento simulado sobre motores de robótica e pesquisa do site https://stemos.com.br/.
+Prova online para assistente administrativo/comercial. Inclui e-mail do pedido 345349, atendimento simulado e pesquisa no site stemOS.
 
-## Versão sem servidor — GitHub Pages
+- Prova: https://gheslaghesla.github.io/stemos-prova-pratica/
+- Painel: https://gheslaghesla.github.io/stemos-prova-pratica/painel.html
+- API e versão independente: https://stemos-prova-pratica.gheslaghesla.workers.dev/
 
-`index.html` funciona em um navegador e permite baixar as respostas e a conversa em `.txt` para envio por e-mail. Os rascunhos ficam no navegador. Não existe recebimento centralizado nem painel nesta versão.
+As respostas são persistidas na Cloudflare D1 (banco stemos-provas), além do TXT disponível ao candidato. O painel exige a variável secreta ADMIN_KEY configurada na Cloudflare, fora do repositório. Sem essa variável, o painel nega acesso.
 
-Para publicar: no repositório, abra Settings → Pages e selecione a branch main, pasta / (root), caso esse recurso esteja disponível no plano e na visibilidade escolhidos.
+O tempo é contado no servidor do início à conclusão, incluindo pausas e pesquisa. Cada tentativa possui seu próprio protocolo. O mesmo candidato pode realizar novas tentativas; reenvios do mesmo protocolo não duplicam o registro.
 
-## Versão completa — painel protegido
+## Arquivos
 
-`worker.js` roda em Cloudflare Workers. As respostas são persistidas em R2 e o painel fica em `/avaliador`, com chave de acesso verificada no servidor. O GitHub armazena o código; GitHub Pages não executa o painel nem o armazenamento R2.
+index.html e painel.html usam a API hospedada. worker.js implementa a aplicação e a API. schema.sql descreve a tabela já criada na Cloudflare. wrangler.jsonc contém o binding DB.
 
-Com Node.js instalado e uma conta Cloudflare:
+## Deploy
 
-```sh
-npm install
-npx wrangler login
-npx wrangler r2 bucket create stemos-provas
-npx wrangler secret put ADMIN_KEY
-npm run check
-npm run deploy
-```
+Com Node.js e acesso à conta Cloudflare: npm install; npx wrangler login; npx wrangler secret put ADMIN_KEY; npm run deploy. Não execute schema.sql outra vez no banco existente. Novas instalações precisam da tabela records antes do primeiro uso.
 
-No comando de segredo, informe uma chave longa e aleatória e guarde-a para acessar o painel. Nunca a coloque no repositório. A configuração de R2 está em `wrangler.jsonc`.
+## Simulação
 
-Envie aos candidatos a URL raiz publicada pelo Workers. Acesse `/avaliador` e informe a chave para consultar as respostas. Ao concluir a prova, o candidato também pode baixar um `.txt` e anexá-lo a um e-mail.
+O cliente fictício responde por reconhecimento de palavras, sem conexão com WhatsApp real ou IA. A avaliação do candidato é humana.
 
-## Como funciona a simulação
+## Verificação
 
-O cliente fictício responde por regras de reconhecimento de palavras em português, sem integração com WhatsApp real ou modelo de IA. O cenário é fixo para todos: Mariana, professora do Colégio Horizonte, em Campinas, com uma equipe iniciante de FTC. As informações são reveladas conforme as perguntas. A simulação pode não compreender todas as formulações; a avaliação do atendimento deve ser humana.
-
-Não há cronômetro, pontuação automática ou decisões automáticas de contratação. O candidato pode escolher livremente o formato do e-mail. Nome e e-mail identificam a prova. O candidato recebe informação sobre o registro de suas respostas.
-
-## Verificação realizada
-
-Sintaxe do Worker e do JavaScript da página; respostas da simulação; proteção do endpoint de avaliação; validação do envio; gravação e leitura com armazenamento em memória e prevenção de duplicidade para o mesmo protocolo. Deploy real de Workers/R2 e revisão visual em navegador ainda precisam ser verificados.
+Testados: contagem no servidor, resistência a timestamp alterado no cliente, tentativas separadas, reenvio idempotente, proteção do painel e sintaxe do frontend/Worker.
